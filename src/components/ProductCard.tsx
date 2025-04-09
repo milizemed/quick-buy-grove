@@ -2,8 +2,9 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { ProductType } from '@/types/product';
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 
 interface ProductCardProps {
@@ -12,9 +13,26 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  
+  const toggleWishlist = () => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
   
   return (
-    <Card className="h-full flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+    <Card className="h-full flex flex-col hover:shadow-lg transition-shadow overflow-hidden group relative">
+      <button
+        onClick={toggleWishlist}
+        className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-1.5 backdrop-blur-sm opacity-80 group-hover:opacity-100 transition-opacity"
+        aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+      >
+        <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+      </button>
+      
       <Link to={`/product/${product.id}`} className="overflow-hidden">
         <div className="aspect-square overflow-hidden">
           <img
